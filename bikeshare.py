@@ -5,6 +5,32 @@ import numpy as np
 CITY_DATA = { 'chicago': 'chicago.csv',
               'new york city': 'new_york_city.csv',
               'washington': 'washington.csv' }
+# line 9-65 was added and changed from my original code to incorporate and reduce repetition as a suggestion from code reviewer for this project.
+def check_data_entry(prompt, valid_entries):
+    """
+    Asks user to type some input and verify if the entry typed is valid.
+    Since we have 3 inputs to ask the user in get_filters(), it is easier to write a function.
+    Args:
+        (str) prompt - message to display to the user
+        (list) valid_entries - list of string that should be accepted
+    Returns:
+        (str) user_input - the user's valid input
+    """
+    try:
+        user_input = str(input(prompt)).lower()
+
+        while user_input not in valid_entries :
+            print('Sorry... it seems like you\'re not typing a correct entry.')
+            print('Let\'s try again!')
+            user_input = str(input(prompt)).lower()
+
+        print('Great! the chosen entry is: {}\n'.format(user_input))
+        return user_input
+
+    except:
+        print('Seems like there is an issue with your input')
+
+
 
 def get_filters():
     """
@@ -15,50 +41,28 @@ def get_filters():
         (str) month - name of the month to filter by, or "all" to apply no month filter
         (str) day - name of the day of week to filter by, or "all" to apply no day filter
     """
-    print('Hello! Let\'s explore some US bikeshare data!')
-    
-    # TO DO: get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
 
-    cities = ['chicago', 'new york city', 'washington']
+    print('Hi there! Let\'s explore some US bikeshare data!')
 
-    city = input('\n Enter city. \nChoose either chicago, new york city, or washington: ').lower()
-    print(city)
-    while city not in cities:
-        print('\nPlease choose a valid city, either: chicago, new york city, or washington.').lower()
-        break
-    else:
-        print("\nWe are working with {} data".format(city.title()))
-        
-        
-        # TO DO: get user input for month (all, january, february, ... , june)
+    # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
+    valid_cities = CITY_DATA.keys()
+    prompt_cities = 'Please choose one of the 3 cities (chicago, new york city, washington): '
+    city = check_data_entry(prompt_cities, valid_cities)
 
-    months = ['all', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'October', 'November', 'December']
 
-    month = input('\nPlease select the month for which you wish to see data. Alternatively you can select all: ').lower()
-    print(month)
-    while month not in months:
-        break
-    else:
-        print('\nPlease choose a valid month: ').lower()
-            
+    # get user input for month (all, january, february, ... , june)
+    valid_months = ['all','january','february','march','april','may','june']
+    prompt_month = 'Please choose a month (all, january, february, ... , june): '
+    month = check_data_entry(prompt_month, valid_months)
 
-        # TO DO: get user input for day of week (all, monday, tuesday, ... sunday)
+    # get user input for day of week (all, monday, tuesday, ... sunday)
+    valid_days = ['all','monday','tuesday','wednesday','thursday','friday','saturday', 'sunday']
+    prompt_day = 'Please choose a day (all, monday, tuesday, ... sunday): '
+    day = check_data_entry(prompt_day, valid_days)
 
-    days = ['all', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-
-    day = input('\nPlease select the day for which you wish to see the data. Alternatively you can select all: ').lower()
-    print(day)
-    while day not in days:
-        break
-    else:
-        print('\nPlease choose a valid day: ').lower()
-            
-
-    print('Awesome! we will be looking at data in {} for the month of {} on {}'.format(city, month, day))
 
     print('-'*40)
-
-    return (city, month, day)
+    return city, month, day
     city, month, day = get_filters()
     df = load_data(city, month, day)
     print (df)
@@ -77,34 +81,34 @@ def load_data(city, month, day):
     """
     df = pd.read_csv(CITY_DATA[city])
     df['Start Time'] = pd.to_datetime(df['Start Time'])
-    
+
     df['month'] = df['Start Time'].dt.month
     df['day'] = df['Start Time'].dt.day
     df['hour'] = df['Start Time'].dt.hour
-    
+
     if month != 'all':
         months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'october', 'november', 'december']
         month = months.index(month) + 1
         df = df[df['month'] == month]
-    
+
     if day != 'all':
         days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
         day = days.index(day) + 1
-        
+
         df = df[df['day'] == day]
-        
+
     return df
 
 
 
-    
+
 def time_stats(df):
     """Displays statistics on the most frequent times of travel."""
 
     print('\nCalculating The Most Frequent Times of Travel...\n')
 
     start_time = time.time()
-    
+
     df['Start Time'] = pd.to_datetime(df['Start Time'])
     df['month'] = df['Start Time'].dt.month
     df['day'] = df['Start Time'].dt.day
@@ -154,7 +158,7 @@ def trip_duration_stats(df):
 
     print('\nCalculating Trip Duration...\n')
     start_time = time.time()
-    
+
     df['Start Time'] = pd.to_datetime(df['Start Time'])
     df['month'] = df['Start Time'].dt.month
     df['day'] = df['Start Time'].dt.day
@@ -185,10 +189,10 @@ def user_stats(df, city):
 
         # TO DO: Display counts of gender
     if city == 'washington':
-        print('Gender data is not available for the city of washington')   
+        print('Gender data is not available for the city of washington')
     else:
         gender_count = df['Gender'].value_counts()
-        print('Counts of genders: \n', gender_count) 
+        print('Counts of genders: \n', gender_count)
 
         # TO DO: Display earliest, most recent, and most common year of birth
     if city == 'washington':
@@ -206,19 +210,18 @@ def user_stats(df, city):
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
-    
+
 def display_data(df):
     """ Raw data Prompt """
     raw_data = input('Would you like to see 5 lines of raw data? Yes or no: ').lower()
-    
+
     start = 0
-    
+
     while True:
         if raw_data != 'no':
             print(df.iloc[start:start +5])
             start += 5
-            
-            end_display = input('Would you like to continue? Yes or no: ').lower()
+            raw_data = input('Would you like to continue? Yes or no: ').lower() #corrected end_display to raw_data.
         else:
             break
 
@@ -239,4 +242,4 @@ def main():
 
 
 if __name__ == "__main__":
-	main()
+    main()
