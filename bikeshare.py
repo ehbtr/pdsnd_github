@@ -221,8 +221,7 @@ def display_data(df):
         if raw_data != 'no':
             print(df.iloc[start:start +5])
             start += 5
-
-            end_display = input('Would you like to continue? Yes or no: ').lower()
+            raw_data = input('Would you like to continue? Yes or no: ').lower() #corrected end_display to raw_data.
         else:
             break
 
@@ -243,4 +242,4 @@ def main():
 
 
 if __name__ == "__main__":
-	main()
+    main()
